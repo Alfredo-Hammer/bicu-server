@@ -164,26 +164,19 @@ async function migrate() {
     await client.connect();
     console.log('✅ Conexión establecida\n');
 
-    // Verificar si ya hay tablas
+    // Verificar si hay tablas (solo para logging)
     const tablesExist = await checkTablesExist();
-
+    
     if (tablesExist) {
-      console.log('⚠️  Las tablas principales ya existen.');
-      console.log('⚠️  Ejecutando solo migraciones incrementales...\n');
-
-      // Solo ejecutar las migraciones nuevas
-      const migrationScripts = SQL_SCRIPTS.filter(script => script.includes('migrations/'));
-
-      for (const script of migrationScripts) {
-        await executeSQLFile(script);
-      }
+      console.log('ℹ️  Tablas detectadas. Ejecutando migraciones de forma idempotente...\n');
     } else {
-      console.log('📦 Base de datos vacía. Ejecutando todas las migraciones...\n');
+      console.log('📦 Base de datos vacía. Creando estructura completa...\n');
+    }
 
-      // Ejecutar todos los scripts
-      for (const script of SQL_SCRIPTS) {
-        await executeSQLFile(script);
-      }
+    // SIEMPRE ejecutar TODOS los scripts (son idempotentes)
+    // Esto garantiza que todas las tablas existan antes de las migraciones
+    for (const script of SQL_SCRIPTS) {
+      await executeSQLFile(script);
     }
 
     const totalTime = Date.now() - startTime;
@@ -239,6 +232,8 @@ module.exports = { migrate };
 - ✅ Al finalizar, muestra TODAS las tablas en la BD para verificar
 - ✅ Manejo robusto de errores idempotentes
 - ✅ Compatible con DATABASE_URL de Render
+- ✅ **SIEMPRE ejecuta todos los scripts en orden** (sin lógica condicional)
+- ✅ Garantiza que las migraciones se ejecuten DESPUÉS de crear todas las tablas base
 
 ---
 
@@ -364,7 +359,9 @@ CREATE INDEX IF NOT EXISTS idx_outputs_date ON outputs(date);
 3. **✅ Logs detallados**: Puedes ver en Render EXACTAMENTE qué tablas se crearon
 4. **✅ Compatible con Free Tier**: No requiere recursos adicionales
 5. **✅ Seguro**: Si las migraciones fallan, el servidor NO inicia
-6. **✅ Rápido**: Detecta tablas existentes y solo ejecuta lo necesario
+6. **✅ Predecible**: SIEMPRE ejecuta todos los scripts en el mismo orden
+7. **✅ Sin lógica condicional**: No hay riesgo de saltar scripts necesarios
+8. **✅ Orden garantizado**: Las migraciones siempre se ejecutan DESPUÉS de las tablas base
 
 ---
 
@@ -384,7 +381,7 @@ Cuando despliegues, verás logs similares a estos en Render:
 🔌 Conectando a PostgreSQL...
 ✅ Conexión establecida
 
-📦 Base de datos vacía. Ejecutando todas las migraciones...
+ℹ️  Tablas detectadas. Ejecutando migraciones de forma idempotente...
 
 📄 Ejecutando: database/init.sql
    Tamaño: 1.23 KB
@@ -500,6 +497,61 @@ npm start
 
 ---
 
+## 🔧 Resolución del Error "relation does not exist"
+
+### Problema Original
+
+```
+❌ ERROR CRÍTICO en database/migrations/001_multi_tenant.sql:
+   Mensaje: relation "entries" does not exist
+```
+
+### Causa Raíz
+
+El script de migración tenía lógica condicional que, al detectar tablas existentes (como `organizations`), **saltaba** los scripts base (init.sql, movements.sql, etc.) y solo ejecutaba las migraciones incrementales. Esto causaba que `001_multi_tenant.sql` intentara modificar tablas que no existían.
+
+### Solución Implementada
+
+**Eliminada la lógica condicional**. Ahora el script **SIEMPRE ejecuta TODOS los archivos SQL en orden**:
+
+```javascript
+// ❌ ANTES: Lógica condicional que saltaba scripts
+if (tablesExist) {
+  // Solo migraciones incrementales
+  const migrationScripts = SQL_SCRIPTS.filter(script => script.includes('migrations/'));
+  for (const script of migrationScripts) {
+    await executeSQLFile(script);
+  }
+} else {
+  // Todos los scripts
+  for (const script of SQL_SCRIPTS) {
+    await executeSQLFile(script);
+  }
+}
+
+// ✅ AHORA: Siempre ejecuta todos los scripts
+for (const script of SQL_SCRIPTS) {
+  await executeSQLFile(script);
+}
+```
+
+### Por Qué Funciona
+
+1. **Todos los scripts son idempotentes**: Usan `CREATE TABLE IF NOT EXISTS`, `CREATE INDEX IF NOT EXISTS`, etc.
+2. **No hay duplicación**: Si una tabla ya existe, PostgreSQL la ignora (no hay error)
+3. **Orden garantizado**: Las migraciones (001, 002, 003) SIEMPRE se ejecutan DESPUÉS de crear todas las tablas base
+4. **Predecible**: El mismo comportamiento en deploy inicial y en redespliegues
+
+### Beneficios
+
+- ✅ No más errores "relation does not exist"
+- ✅ Comportamiento consistente en todos los despliegues
+- ✅ Más simple de entender y mantener
+- ✅ No requiere lógica compleja para detectar estado de la BD
+
+---
+
 **Fecha de Configuración**: 2026-03-01  
-**Versión**: 2.0 (Optimizada para Render Free Tier)  
+**Última Actualización**: 2026-03-02 (Fix: relation does not exist)  
+**Versión**: 2.1 (Optimizada para Render Free Tier con ejecución secuencial garantizada)  
 **Estado**: ✅ Lista para producción

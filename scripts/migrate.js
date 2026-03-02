@@ -130,26 +130,19 @@ async function migrate() {
     await client.connect();
     console.log('✅ Conexión establecida\n');
 
-    // Verificar si ya hay tablas
+    // Verificar si hay tablas (solo para logging)
     const tablesExist = await checkTablesExist();
 
     if (tablesExist) {
-      console.log('⚠️  Las tablas principales ya existen.');
-      console.log('⚠️  Ejecutando solo migraciones incrementales...\n');
-
-      // Solo ejecutar las migraciones nuevas
-      const migrationScripts = SQL_SCRIPTS.filter(script => script.includes('migrations/'));
-
-      for (const script of migrationScripts) {
-        await executeSQLFile(script);
-      }
+      console.log('ℹ️  Tablas detectadas. Ejecutando migraciones de forma idempotente...\n');
     } else {
-      console.log('📦 Base de datos vacía. Ejecutando todas las migraciones...\n');
+      console.log('📦 Base de datos vacía. Creando estructura completa...\n');
+    }
 
-      // Ejecutar todos los scripts
-      for (const script of SQL_SCRIPTS) {
-        await executeSQLFile(script);
-      }
+    // SIEMPRE ejecutar TODOS los scripts (son idempotentes)
+    // Esto garantiza que todas las tablas existan antes de las migraciones
+    for (const script of SQL_SCRIPTS) {
+      await executeSQLFile(script);
     }
 
     const totalTime = Date.now() - startTime;
