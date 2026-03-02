@@ -1,6 +1,5 @@
 -- Tabla de Configuración del Sistema
 -- Almacena configuraciones globales de la institución
-
 CREATE TABLE IF NOT EXISTS system_settings (
   id SERIAL PRIMARY KEY,
   institution_name VARCHAR(255) DEFAULT 'Universidad BICU',
@@ -15,21 +14,22 @@ CREATE TABLE IF NOT EXISTS system_settings (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
 -- Insertar configuración por defecto solo si no existe ninguna
 INSERT INTO system_settings (
-  institution_name,
-  institution_address,
-  institution_phone,
-  institution_email
-)
-SELECT
-  'Universidad BICU',
+    institution_name,
+    institution_address,
+    institution_phone,
+    institution_email
+  )
+SELECT 'Universidad BICU',
   'Bilwi, Puerto Cabezas, RAAN, Nicaragua',
   '+505 2792-1234',
   'info@bicu.edu.ni'
-WHERE NOT EXISTS (SELECT 1 FROM system_settings LIMIT 1);
-
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM system_settings
+    LIMIT 1
+  );
 -- Comentarios
 COMMENT ON TABLE system_settings IS 'Configuración global del sistema';
 COMMENT ON COLUMN system_settings.institution_name IS 'Nombre de la institución';

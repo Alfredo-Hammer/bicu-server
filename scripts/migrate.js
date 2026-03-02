@@ -58,8 +58,8 @@ async function executeSQLFile(filePath) {
       'violates unique constraint',
       'constraint already exists'
     ];
-    
-    const isSafeError = safeErrors.some(msg => 
+
+    const isSafeError = safeErrors.some(msg =>
       error.message.toLowerCase().includes(msg.toLowerCase())
     );
 
