@@ -23,7 +23,9 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
 CREATE INDEX IF NOT EXISTS idx_users_active ON users(active);
-CREATE INDEX IF NOT EXISTS idx_users_cedula ON users(cedula);
+
+-- NOTA: El índice idx_users_cedula se crea en 006_add_user_extended_fields.sql
+-- junto con las columnas extendidas (apellido, movil, cedula, profesion, etc.)
 
 -- NOTA: El usuario administrador por defecto se crea en la migración
 -- 005_insert_default_admin.sql DESPUÉS de crear la organización por defecto
