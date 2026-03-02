@@ -99,36 +99,6 @@ CREATE TRIGGER update_outputs_updated_at
   EXECUTE FUNCTION update_updated_at_column();
 
 -- ============================================
--- SAMPLE DATA FOR TESTING
--- ============================================
-
--- Sample entry (purchase from supplier)
-INSERT INTO entries (supplier_id, user_id, notes) VALUES
-(1, 1, 'Compra inicial de repuestos para laboratorio');
-
--- Sample entry details
-INSERT INTO entry_details (entry_id, spare_part_id, quantity, unit_price) VALUES
-(1, 1, 50, 15.50),
-(1, 2, 30, 45.00);
-
--- Update stock for these entries (manual for initial data)
-UPDATE spare_parts SET stock = stock + 50 WHERE id = 1;
-UPDATE spare_parts SET stock = stock + 30 WHERE id = 2;
-
--- Sample output (repair usage)
-INSERT INTO outputs (technician_id, equipment_id, notes) VALUES
-(1, 1, 'Reparación de PC en Laboratorio 1');
-
--- Sample output details
-INSERT INTO output_details (output_id, spare_part_id, quantity) VALUES
-(1, 1, 2),
-(1, 2, 1);
-
--- Update stock for these outputs (manual for initial data)
-UPDATE spare_parts SET stock = stock - 2 WHERE id = 1;
-UPDATE spare_parts SET stock = stock - 1 WHERE id = 2;
-
--- ============================================
 -- VERIFICATION
 -- ============================================
 
@@ -139,5 +109,11 @@ SELECT COUNT(*) AS entry_detail_count FROM entry_details;
 SELECT COUNT(*) AS output_count FROM outputs;
 SELECT COUNT(*) AS output_detail_count FROM output_details;
 
--- Show current stock after movements
-SELECT id, name, stock FROM spare_parts WHERE id IN (1, 2);
+-- ============================================
+-- NOTA SOBRE DATOS DE EJEMPLO
+-- ============================================
+-- Los datos de ejemplo han sido removidos para evitar
+-- errores de foreign key constraints en deploy automático.
+-- Los datos se deben crear a través de la aplicación web
+-- una vez que el sistema esté en funcionamiento.
+-- ============================================

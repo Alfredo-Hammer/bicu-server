@@ -22,11 +22,12 @@ CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_role ON users(role);
 CREATE INDEX idx_users_active ON users(active);
 
--- Insert default admin user
+-- Insert default admin user (idempotent)
 -- Password: admin123 (CHANGE THIS IN PRODUCTION!)
 -- Password hash generated with bcrypt, salt rounds: 10
 INSERT INTO users (name, email, password_hash, role) VALUES
-('Administrador', 'admin@bicu.edu.ni', '$2b$10$rZ5YhkqJxKxJxKxJxKxJxeO5YhkqJxKxJxKxJxKxJxKxJxKxJxKxJ', 'admin');
+('Administrador', 'admin@bicu.edu.ni', '$2b$10$rZ5YhkqJxKxJxKxJxKxJxeO5YhkqJxKxJxKxJxKxJxKxJxKxJxKxJ', 'admin')
+ON CONFLICT (email) DO NOTHING;
 
 -- Note: The password hash above is a placeholder. 
 -- To generate a real hash, use the following Node.js code:

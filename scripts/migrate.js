@@ -51,8 +51,19 @@ async function executeSQLFile(filePath) {
     console.log(`✅ Completado: ${filePath}`);
     return true;
   } catch (error) {
-    // Si el error es "already exists", no es crítico
-    if (error.message.includes('already exists')) {
+    // Errores que son seguros ignorar (operaciones idempotentes)
+    const safeErrors = [
+      'already exists',
+      'duplicate key',
+      'violates unique constraint',
+      'constraint already exists'
+    ];
+    
+    const isSafeError = safeErrors.some(msg => 
+      error.message.toLowerCase().includes(msg.toLowerCase())
+    );
+
+    if (isSafeError) {
       console.log(`⚠️  Ya existe (omitiendo): ${filePath}`);
       return true;
     }

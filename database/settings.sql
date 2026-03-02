@@ -16,18 +16,19 @@ CREATE TABLE IF NOT EXISTS system_settings (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Insertar configuración por defecto
+-- Insertar configuración por defecto solo si no existe ninguna
 INSERT INTO system_settings (
   institution_name,
   institution_address,
   institution_phone,
   institution_email
-) VALUES (
+)
+SELECT
   'Universidad BICU',
   'Bilwi, Puerto Cabezas, RAAN, Nicaragua',
   '+505 2792-1234',
   'info@bicu.edu.ni'
-) ON CONFLICT DO NOTHING;
+WHERE NOT EXISTS (SELECT 1 FROM system_settings LIMIT 1);
 
 -- Comentarios
 COMMENT ON TABLE system_settings IS 'Configuración global del sistema';

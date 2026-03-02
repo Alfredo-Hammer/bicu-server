@@ -49,14 +49,15 @@ CREATE TRIGGER update_spare_parts_updated_at
 BEFORE UPDATE ON spare_parts
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- Insert sample categories
+-- Insert sample categories (idempotent)
 INSERT INTO categories (name, description) VALUES
 ('Procesadores', 'CPUs y procesadores de computadora'),
 ('Memoria RAM', 'Módulos de memoria RAM'),
 ('Discos Duros', 'HDD y SSD'),
 ('Tarjetas Madre', 'Motherboards y placas base'),
 ('Fuentes de Poder', 'Power supplies'),
-('Periféricos', 'Teclados, mouse, etc.');
+('Periféricos', 'Teclados, mouse, etc.')
+ON CONFLICT (name) DO NOTHING;
 
 -- Verify installation
 SELECT 'Inventory tables created successfully!' AS status;
