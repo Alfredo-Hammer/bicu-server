@@ -76,27 +76,35 @@ JWT_SECRET=tu_clave_secreta_muy_segura
 JWT_EXPIRES_IN=24h
 ```
 
-### 4. Crear la base de datos
+### 4. Ejecutar migraciones de base de datos
+
+**Opción recomendada - Migraciones automáticas:**
 
 ```bash
-# Conectar a PostgreSQL
-psql -U postgres
-
-# Crear la base de datos
-CREATE DATABASE bicu_inventory;
-
-# Salir de psql
-\q
+npm run migrate
 ```
 
-### 5. Ejecutar el script de inicialización
+Este comando ejecutará automáticamente todos los scripts SQL en orden:
+- `init.sql` - Tablas base (roles, organizations, users)
+- `support_entities.sql` - Categorías y proveedores
+- `inventory.sql` - Repuestos y equipos
+- `movements.sql` - Entradas y salidas
+- `audit.sql` - Auditoría
+- `settings.sql` - Configuración
+- `migrations/*.sql` - Migraciones incrementales
+
+📖 **Más información:** Ver [DATABASE_MIGRATIONS.md](DATABASE_MIGRATIONS.md)
+
+**Opción manual (alternativa):**
 
 ```bash
-# Ejecutar el script SQL
-psql -U postgres -d bicu_inventory -f ../database/init.sql
+# Ejecutar scripts SQL manualmente
+psql -U postgres -d bicu_inventory -f database/init.sql
+psql -U postgres -d bicu_inventory -f database/support_entities.sql
+# ... etc
 ```
 
-### 6. Crear usuario administrador
+### 5. Crear usuario administrador
 
 ```bash
 # Asegúrate de tener el archivo .env configurado
@@ -280,11 +288,62 @@ Esta es la base del backend. Los siguientes módulos a implementar son:
 - Validación de datos en todos los endpoints
 - Middleware de autorización por roles
 
+## � Deploy en Render
+
+El proyecto está configurado para deploy automático en Render.
+
+### Características del Deploy
+
+✅ **Migraciones automáticas:** Las tablas se crean automáticamente en el primer deploy  
+✅ **PostgreSQL incluido:** Base de datos administrada por Render  
+✅ **SSL configurado:** Conexión segura a la base de datos  
+✅ **Variables de entorno:** Configuradas en `render.yaml`  
+✅ **Auto-deploy:** Cada push a `main` activa un nuevo deploy  
+
+### Pasos para Deploy
+
+1. **Conectar repositorio en Render:**
+   - New + → Blueprint
+   - Seleccionar `bicu-server`
+   - Render detecta automáticamente el `render.yaml`
+
+2. **Render creará automáticamente:**
+   - Web Service: `bicu-server`
+   - PostgreSQL Database: `bicu-db`
+   - Variables de entorno necesarias
+
+3. **Migraciones automáticas:**
+   - Se ejecutan en cada deploy: `npm run migrate`
+   - Crean todas las tablas si la BD está vacía
+   - Solo ejecutan migraciones nuevas en re-deploys
+
+### Variables de Entorno en Render
+
+Configuradas automáticamente por `render.yaml`:
+
+```env
+NODE_ENV=production
+PORT=10000
+FRONTEND_URL=https://bicu-client.onrender.com
+DATABASE_URL=(generado automáticamente por Render)
+JWT_SECRET=(generado automáticamente)
+JWT_EXPIRES_IN=24h
+```
+
+### URLs del Servicio
+
+- **API:** `https://bicu-server.onrender.com/api`
+- **Health Check:** `https://bicu-server.onrender.com/api/health`
+
+📖 **Más información:** Ver [DATABASE_MIGRATIONS.md](DATABASE_MIGRATIONS.md) para detalles sobre el sistema de migraciones.
+
 ## 📚 Documentación Adicional
 
 Para más información sobre la arquitectura y reglas del sistema, consultar:
 
-- `AGENTS.md` - Documento de arquitectura y reglas del proyecto
+- [AGENTS.md](../AGENTS.md) - Documento de arquitectura y reglas del proyecto
+- [DATABASE_MIGRATIONS.md](DATABASE_MIGRATIONS.md) - Sistema de migraciones automáticas
+- [SETUP.md](SETUP.md) - Guía de configuración inicial
 
 ## 👥 Autor
 
