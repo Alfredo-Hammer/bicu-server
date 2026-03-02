@@ -2,15 +2,10 @@
 -- INVENTORY MOVEMENTS (KARDEX) MODULE
 -- Entries and Outputs with Automatic Stock Control
 -- ============================================
--- Drop tables if they exist (in correct order due to foreign keys)
-DROP TABLE IF EXISTS output_details CASCADE;
-DROP TABLE IF EXISTS outputs CASCADE;
-DROP TABLE IF EXISTS entry_details CASCADE;
-DROP TABLE IF EXISTS entries CASCADE;
 -- ============================================
 -- ENTRIES TABLE (Purchases/Stock Additions)
 -- ============================================
-CREATE TABLE entries (
+CREATE TABLE IF NOT EXISTS entries (
   id SERIAL PRIMARY KEY,
   supplier_id INTEGER NOT NULL REFERENCES suppliers(id),
   user_id INTEGER NOT NULL REFERENCES users(id),
@@ -23,7 +18,7 @@ CREATE TABLE entries (
 -- ============================================
 -- ENTRY DETAILS TABLE
 -- ============================================
-CREATE TABLE entry_details (
+CREATE TABLE IF NOT EXISTS entry_details (
   id SERIAL PRIMARY KEY,
   entry_id INTEGER NOT NULL REFERENCES entries(id) ON DELETE CASCADE,
   spare_part_id INTEGER NOT NULL REFERENCES spare_parts(id),
@@ -34,7 +29,7 @@ CREATE TABLE entry_details (
 -- ============================================
 -- OUTPUTS TABLE (Usage in Repairs)
 -- ============================================
-CREATE TABLE outputs (
+CREATE TABLE IF NOT EXISTS outputs (
   id SERIAL PRIMARY KEY,
   technician_id INTEGER NOT NULL REFERENCES users(id),
   equipment_id INTEGER NOT NULL REFERENCES equipments(id),
@@ -47,7 +42,7 @@ CREATE TABLE outputs (
 -- ============================================
 -- OUTPUT DETAILS TABLE
 -- ============================================
-CREATE TABLE output_details (
+CREATE TABLE IF NOT EXISTS output_details (
   id SERIAL PRIMARY KEY,
   output_id INTEGER NOT NULL REFERENCES outputs(id) ON DELETE CASCADE,
   spare_part_id INTEGER NOT NULL REFERENCES spare_parts(id),
@@ -57,27 +52,29 @@ CREATE TABLE output_details (
 -- ============================================
 -- INDEXES FOR PERFORMANCE
 -- ============================================
--- Entries indexes
-CREATE INDEX idx_entries_supplier ON entries(supplier_id);
-CREATE INDEX idx_entries_user ON entries(user_id);
-CREATE INDEX idx_entries_date ON entries(date);
-CREATE INDEX idx_entries_active ON entries(active);
+-- Entries indexes (idempotente)
+CREATE INDEX IF NOT EXISTS idx_entries_supplier ON entries(supplier_id);
+CREATE INDEX IF NOT EXISTS idx_entries_user ON entries(user_id);
+CREATE INDEX IF NOT EXISTS idx_entries_date ON entries(date);
+CREATE INDEX IF NOT EXISTS idx_entries_active ON entries(active);
 -- Entry details indexes
-CREATE INDEX idx_entry_details_entry ON entry_details(entry_id);
-CREATE INDEX idx_entry_details_spare_part ON entry_details(spare_part_id);
+CREATE INDEX IF NOT EXISTS idx_entry_details_entry ON entry_details(entry_id);
+CREATE INDEX IF NOT EXISTS idx_entry_details_spare_part ON entry_details(spare_part_id);
 -- Outputs indexes
-CREATE INDEX idx_outputs_technician ON outputs(technician_id);
-CREATE INDEX idx_outputs_equipment ON outputs(equipment_id);
-CREATE INDEX idx_outputs_date ON outputs(date);
-CREATE INDEX idx_outputs_active ON outputs(active);
+CREATE INDEX IF NOT EXISTS idx_outputs_technician ON outputs(technician_id);
+CREATE INDEX IF NOT EXISTS idx_outputs_equipment ON outputs(equipment_id);
+CREATE INDEX IF NOT EXISTS idx_outputs_date ON outputs(date);
+CREATE INDEX IF NOT EXISTS idx_outputs_active ON outputs(active);
 -- Output details indexes
-CREATE INDEX idx_output_details_output ON output_details(output_id);
-CREATE INDEX idx_output_details_spare_part ON output_details(spare_part_id);
+CREATE INDEX IF NOT EXISTS idx_output_details_output ON output_details(output_id);
+CREATE INDEX IF NOT EXISTS idx_output_details_spare_part ON output_details(spare_part_id);
 -- ============================================
 -- TRIGGERS FOR UPDATED_AT
 -- ============================================
+DROP TRIGGER IF EXISTS update_entries_updated_at ON entries;
 CREATE TRIGGER update_entries_updated_at BEFORE
 UPDATE ON entries FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+DROP TRIGGER IF EXISTS update_outputs_updated_at ON outputs;
 CREATE TRIGGER update_outputs_updated_at BEFORE
 UPDATE ON outputs FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 -- ============================================

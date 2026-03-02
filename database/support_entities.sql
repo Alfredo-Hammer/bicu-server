@@ -1,10 +1,7 @@
 -- BICU Inventory System - Support Entities
 -- Suppliers and Equipments Tables
--- Drop existing tables if they exist (for development purposes)
-DROP TABLE IF EXISTS equipments CASCADE;
-DROP TABLE IF EXISTS suppliers CASCADE;
--- Create suppliers table
-CREATE TABLE suppliers (
+-- Create suppliers table (idempotente)
+CREATE TABLE IF NOT EXISTS suppliers (
   id SERIAL PRIMARY KEY,
   name VARCHAR(150) NOT NULL,
   phone VARCHAR(50),
@@ -14,8 +11,8 @@ CREATE TABLE suppliers (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
--- Create equipments table
-CREATE TABLE equipments (
+-- Create equipments table (idempotente)
+CREATE TABLE IF NOT EXISTS equipments (
   id SERIAL PRIMARY KEY,
   code VARCHAR(50) UNIQUE NOT NULL,
   type VARCHAR(50) NOT NULL,

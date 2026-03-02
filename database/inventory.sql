@@ -1,10 +1,7 @@
 -- BICU Inventory System - Inventory Module
 -- Categories and Spare Parts Tables
--- Drop existing tables if they exist (for development purposes)
-DROP TABLE IF EXISTS spare_parts CASCADE;
-DROP TABLE IF EXISTS categories CASCADE;
--- Create categories table
-CREATE TABLE categories (
+-- Create categories table (idempotente)
+CREATE TABLE IF NOT EXISTS categories (
   id SERIAL PRIMARY KEY,
   name VARCHAR(100) UNIQUE NOT NULL,
   description TEXT,
@@ -12,8 +9,8 @@ CREATE TABLE categories (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
--- Create spare_parts table
-CREATE TABLE spare_parts (
+-- Create spare_parts table (idempotente)
+CREATE TABLE IF NOT EXISTS spare_parts (
   id SERIAL PRIMARY KEY,
   name VARCHAR(150) NOT NULL,
   description TEXT,

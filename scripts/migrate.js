@@ -33,7 +33,7 @@ const SQL_SCRIPTS = [
 ];
 
 /**
- * Ejecuta un archivo SQL
+ * Ejecuta un archivo SQL con logs detallados
  */
 async function executeSQLFile(filePath) {
   const fullPath = path.join(__dirname, '..', filePath);
@@ -44,11 +44,28 @@ async function executeSQLFile(filePath) {
   }
 
   const sql = fs.readFileSync(fullPath, 'utf8');
+  const fileName = path.basename(filePath);
 
   try {
-    console.log(`📄 Ejecutando: ${filePath}...`);
+    console.log(`\n📄 Ejecutando: ${filePath}`);
+    console.log(`   Tamaño: ${(sql.length / 1024).toFixed(2)} KB`);
+
+    const startTime = Date.now();
     await client.query(sql);
-    console.log(`✅ Completado: ${filePath}`);
+    const duration = Date.now() - startTime;
+
+    console.log(`✅ Completado: ${fileName} (${duration}ms)`);
+
+    // Log de tablas creadas/actualizadas
+    const tableMatches = sql.match(/CREATE TABLE (IF NOT EXISTS )?([\w_]+)/gi);
+    if (tableMatches && tableMatches.length > 0) {
+      console.log(`   Tablas procesadas: ${tableMatches.length}`);
+      tableMatches.forEach(match => {
+        const tableName = match.replace(/CREATE TABLE (IF NOT EXISTS )?/i, '').trim();
+        console.log(`   ✓ ${tableName}`);
+      });
+    }
+
     return true;
   } catch (error) {
     // Errores que son seguros ignorar (operaciones idempotentes)
@@ -56,7 +73,8 @@ async function executeSQLFile(filePath) {
       'already exists',
       'duplicate key',
       'violates unique constraint',
-      'constraint already exists'
+      'constraint already exists',
+      'relation already exists'
     ];
 
     const isSafeError = safeErrors.some(msg =>
@@ -64,11 +82,13 @@ async function executeSQLFile(filePath) {
     );
 
     if (isSafeError) {
-      console.log(`⚠️  Ya existe (omitiendo): ${filePath}`);
+      console.log(`⚠️  Elementos ya existen en ${fileName} - Continuando...`);
       return true;
     }
 
-    console.error(`❌ Error en ${filePath}:`, error.message);
+    console.error(`\n❌ ERROR CRÍTICO en ${filePath}:`);
+    console.error(`   Mensaje: ${error.message}`);
+    console.error(`   Código: ${error.code}`);
     throw error;
   }
 }
@@ -94,11 +114,14 @@ async function checkTablesExist() {
  * Función principal
  */
 async function migrate() {
-  console.log('═══════════════════════════════════════════════════════');
-  console.log('🚀 INICIANDO MIGRACIÓN DE BASE DE DATOS');
+  const startTime = Date.now();
+  console.log('\n═══════════════════════════════════════════════════════');
+  console.log('🚀 INICIANDO MIGRACIÓN DE BASE DE DATOS - RENDER FREE TIER');
   console.log('═══════════════════════════════════════════════════════');
   console.log(`📌 Entorno: ${process.env.NODE_ENV || 'development'}`);
   console.log(`📌 Base de datos: ${process.env.DB_NAME || 'PostgreSQL (DATABASE_URL)'}`);
+  console.log(`📌 Timestamp: ${new Date().toISOString()}`);
+  console.log(`📌 Scripts a ejecutar: ${SQL_SCRIPTS.length}`);
   console.log('');
 
   try {
@@ -129,10 +152,27 @@ async function migrate() {
       }
     }
 
-    console.log('');
-    console.log('═══════════════════════════════════════════════════════');
+    const totalTime = Date.now() - startTime;
+
+    // Verificar tablas creadas
+    const tablesResult = await client.query(`
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public' 
+      ORDER BY table_name
+    `);
+
+    console.log('\n═══════════════════════════════════════════════════════');
     console.log('✅ MIGRACIÓN COMPLETADA EXITOSAMENTE');
     console.log('═══════════════════════════════════════════════════════');
+    console.log(`⏱️  Tiempo total: ${(totalTime / 1000).toFixed(2)}s`);
+    console.log(`📊 Tablas en base de datos: ${tablesResult.rows.length}`);
+    console.log('\n📋 Tablas disponibles:');
+    tablesResult.rows.forEach(row => {
+      console.log(`   ✓ ${row.table_name}`);
+    });
+    console.log('\n🎉 Base de datos lista para usar!');
+    console.log('═══════════════════════════════════════════════════════\n');
 
     process.exit(0);
   } catch (error) {

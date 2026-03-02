@@ -4,10 +4,10 @@
   "description": "Backend API for BICU Computer Spare Parts Inventory System",
   "main": "src/server.js",
   "scripts": {
-    "start": "node src/server.js",
+    "start": "npm run migrate && node src/server.js",
     "dev": "nodemon src/server.js",
     "migrate": "node scripts/migrate.js",
-    "build": "npm run migrate",
+    "build": "echo 'Build completed'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

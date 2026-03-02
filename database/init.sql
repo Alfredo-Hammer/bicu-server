@@ -1,9 +1,7 @@
 -- BICU Inventory System - Database Initialization Script
 -- Sistema de Inventario de Repuestos Informáticos - Universidad BICU
--- Drop existing tables if they exist (for development purposes)
-DROP TABLE IF EXISTS users CASCADE;
--- Create users table
-CREATE TABLE users (
+-- Create users table (idempotente)
+CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
   email VARCHAR(100) UNIQUE NOT NULL,
@@ -14,10 +12,10 @@ CREATE TABLE users (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
--- Create index on email for faster lookups
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_role ON users(role);
-CREATE INDEX idx_users_active ON users(active);
+-- Create indexes on email for faster lookups (idempotente)
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
+CREATE INDEX IF NOT EXISTS idx_users_active ON users(active);
 -- Insert default admin user (idempotent)
 -- Password: admin123 (CHANGE THIS IN PRODUCTION!)
 -- Password hash generated with bcrypt, salt rounds: 10
