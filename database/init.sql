@@ -4,8 +4,14 @@
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
+  apellido VARCHAR(100),
   email VARCHAR(100) UNIQUE NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
+  movil VARCHAR(20),
+  cedula VARCHAR(20),
+  profesion VARCHAR(100),
+  direccion TEXT,
+  estado VARCHAR(50),
   role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'tecnico', 'supervisor')),
   profile_image TEXT,
   active BOOLEAN DEFAULT true,
@@ -15,14 +21,12 @@ CREATE TABLE IF NOT EXISTS users (
 );
 -- Create indexes on email for faster lookups (idempotente)
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
--- Create indexes on email for faster lookups (idempotente)
-CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
 CREATE INDEX IF NOT EXISTS idx_users_active ON users(active);
+CREATE INDEX IF NOT EXISTS idx_users_cedula ON users(cedula);
 
 -- NOTA: El usuario administrador por defecto se crea en la migración
 -- 005_insert_default_admin.sql DESPUÉS de crear la organización por defecto
-
 -- Create function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = CURRENT_TIMESTAMP;
 RETURN NEW;

@@ -5,34 +5,32 @@
 -- Descripción: Inserta el usuario admin para la organización por defecto BICU-BLF
 -- Se ejecuta DESPUÉS de crear la tabla organizations (001_multi_tenant.sql)
 -- ====================================================
-
 -- Insertar usuario administrador por defecto para BICU-BLF
 -- Password: admin123 (CAMBIAR INMEDIATAMENTE EN PRODUCCIÓN!)
 -- Hash generado con bcrypt, salt rounds: 10
-
-INSERT INTO users (name, email, password_hash, role, organization_id)
-SELECT 
-  'Administrador',
+INSERT INTO users (
+    name,
+    email,
+    password_hash,
+    role,
+    organization_id
+  )
+SELECT 'Administrador',
   'admin@bicu.edu.ni',
   '$2b$10$rZ5YhkqJxKxJxKxJxKxJxeO5YhkqJxKxJxKxJxKxJxKxJxKxJxKxJ',
   'admin',
   org.id
 FROM organizations org
-WHERE org.code = 'BICU-BLF'
-ON CONFLICT (email) DO NOTHING;
-
+WHERE org.code = 'BICU-BLF' ON CONFLICT (email) DO NOTHING;
 -- Verificación
 DO $$
-DECLARE
-  user_count INTEGER;
+DECLARE user_count INTEGER;
 BEGIN
-  SELECT COUNT(*) INTO user_count FROM users WHERE email = 'admin@bicu.edu.ni';
-  
-  IF user_count > 0 THEN
-    RAISE NOTICE '✓ Usuario admin@bicu.edu.ni creado/verificado exitosamente';
-  ELSE
-    RAISE WARNING '⚠ No se pudo crear el usuario admin (organización BICU-BLF no existe)';
-  END IF;
+SELECT COUNT(*) INTO user_count
+FROM users
+WHERE email = 'admin@bicu.edu.ni';
+IF user_count > 0 THEN RAISE NOTICE '✓ Usuario admin@bicu.edu.ni creado/verificado exitosamente';
+ELSE RAISE WARNING '⚠ No se pudo crear el usuario admin (organización BICU-BLF no existe)';
+END IF;
 END $$;
-
 SELECT 'Migración 005 completada: usuario admin insertado' AS status;
