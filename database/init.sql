@@ -15,23 +15,14 @@ CREATE TABLE IF NOT EXISTS users (
 );
 -- Create indexes on email for faster lookups (idempotente)
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+-- Create indexes on email for faster lookups (idempotente)
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
 CREATE INDEX IF NOT EXISTS idx_users_active ON users(active);
--- Insert default admin user (idempotent)
--- Password: admin123 (CHANGE THIS IN PRODUCTION!)
--- Password hash generated with bcrypt, salt rounds: 10
-INSERT INTO users (name, email, password_hash, role)
-VALUES (
-    'Administrador',
-    'admin@bicu.edu.ni',
-    '$2b$10$rZ5YhkqJxKxJxKxJxKxJxeO5YhkqJxKxJxKxJxKxJxKxJxKxJxKxJ',
-    'admin'
-  ) ON CONFLICT (email) DO NOTHING;
--- Note: The password hash above is a placeholder. 
--- To generate a real hash, use the following Node.js code:
--- const bcrypt = require('bcrypt');
--- const hash = await bcrypt.hash('admin123', 10);
--- console.log(hash);
+
+-- NOTA: El usuario administrador por defecto se crea en la migración
+-- 005_insert_default_admin.sql DESPUÉS de crear la organización por defecto
+
 -- Create function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = CURRENT_TIMESTAMP;
 RETURN NEW;
