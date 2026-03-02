@@ -30,6 +30,7 @@ const SQL_SCRIPTS = [
   'database/migrations/001_multi_tenant.sql',
   'database/migrations/002_add_equipment_image.sql',
   'database/migrations/003_add_equipment_repairs.sql',
+  'database/migrations/004_add_user_profile_image.sql',
 ];
 
 /**
