@@ -16,6 +16,7 @@ const outputRoutes = require('./routes/outputRoutes');
 const userRoutes = require('./routes/userRoutes');
 const auditRoutes = require('./routes/auditRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
+const diagnosticRoutes = require('./routes/diagnosticRoutes'); // TEMPORAL para debugging
 
 const app = express();
 
@@ -66,7 +67,8 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
-
+diagnostic', diagnosticRoutes); // TEMPORAL - Eliminar después de debugging
+app.use('/api/
 app.use('/api/auth', authRoutes);
 app.use('/api/organizations', organizationRoutes);
 app.use('/api/categories', categoryRoutes);

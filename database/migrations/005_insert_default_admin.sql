@@ -21,9 +21,10 @@ SELECT 'Administrador',
   'admin',
   org.id
 FROM organizations org
-WHERE org.code = 'BICU-BLF' ON CONFLICT (email) DO UPDATE
-  SET password_hash = EXCLUDED.password_hash,
-      organization_id = EXCLUDED.organization_id;
+WHERE org.code = 'BICU-BLF' ON CONFLICT (email) DO
+UPDATE
+SET password_hash = EXCLUDED.password_hash,
+  organization_id = EXCLUDED.organization_id;
 -- Verificación
 DO $$
 DECLARE user_count INTEGER;
