@@ -16,6 +16,7 @@ const outputRoutes = require('./routes/outputRoutes');
 const userRoutes = require('./routes/userRoutes');
 const auditRoutes = require('./routes/auditRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const diagnosticRoutes = require('./routes/diagnosticRoutes'); // TEMPORAL para debugging
 const debugTokenRoutes = require('./routes/debugTokenRoutes'); // TEMPORAL para debugging
 
@@ -82,6 +83,7 @@ app.use('/api/outputs', outputRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/audit', auditRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
