@@ -113,8 +113,8 @@ class EntryModel {
         e.notes,
         e.created_at
       FROM entries e
-      LEFT JOIN suppliers s ON e.supplier_id = s.id
-      LEFT JOIN users u ON e.user_id = u.id
+      LEFT JOIN suppliers s ON e.supplier_id = s.id AND s.organization_id = $1
+      LEFT JOIN users u ON e.user_id = u.id AND u.organization_id = $1
       WHERE e.organization_id = $1 AND e.active = true
     `;
 

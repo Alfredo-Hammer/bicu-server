@@ -113,8 +113,8 @@ class OutputModel {
         o.notes,
         o.created_at
       FROM outputs o
-      LEFT JOIN users u ON o.technician_id = u.id
-      LEFT JOIN equipments e ON o.equipment_id = e.id
+      LEFT JOIN users u ON o.technician_id = u.id AND u.organization_id = $1
+      LEFT JOIN equipments e ON o.equipment_id = e.id AND e.organization_id = $1
       WHERE o.organization_id = $1 AND o.active = true
     `;
 
