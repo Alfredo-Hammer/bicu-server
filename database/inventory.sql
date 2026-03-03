@@ -13,24 +13,27 @@ CREATE TABLE IF NOT EXISTS categories (
 CREATE TABLE IF NOT EXISTS spare_parts (
   id SERIAL PRIMARY KEY,
   name VARCHAR(150) NOT NULL,
+  code VARCHAR(50),
   description TEXT,
-  category_id INTEGER REFERENCES categories(id) ON DELETE
-  SET NULL,
-    stock INTEGER DEFAULT 0 CHECK (stock >= 0),
-    min_stock INTEGER DEFAULT 1 CHECK (min_stock >= 0),
-    location VARCHAR(150),
-    image_url TEXT,
-    active BOOLEAN DEFAULT true,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL,
+  stock INTEGER DEFAULT 0 CHECK (stock >= 0),
+  min_stock INTEGER DEFAULT 1 CHECK (min_stock >= 0),
+  price DECIMAL(10, 2),
+  location VARCHAR(150),
+  image_url TEXT,
+  active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 -- Create indexes for better query performance
-CREATE INDEX idx_categories_name ON categories(name);
-CREATE INDEX idx_categories_active ON categories(active);
-CREATE INDEX idx_spare_parts_name ON spare_parts(name);
-CREATE INDEX idx_spare_parts_category_id ON spare_parts(category_id);
-CREATE INDEX idx_spare_parts_active ON spare_parts(active);
-CREATE INDEX idx_spare_parts_stock ON spare_parts(stock);
+CREATE INDEX IF NOT EXISTS idx_categories_name ON categories(name);
+CREATE INDEX IF NOT EXISTS idx_categories_active ON categories(active);
+CREATE INDEX IF NOT EXISTS idx_spare_parts_name ON spare_parts(name);
+CREATE INDEX IF NOT EXISTS idx_spare_parts_code ON spare_parts(code);
+CREATE INDEX IF NOT EXISTS idx_spare_parts_category_id ON spare_parts(category_id);
+CREATE INDEX IF NOT EXISTS idx_spare_parts_active ON spare_parts(active);
+CREATE INDEX IF NOT EXISTS idx_spare_parts_stock ON spare_parts(stock);
+CREATE INDEX IF NOT EXISTS idx_spare_parts_price ON spare_parts(price);
 -- Create trigger for categories updated_at
 CREATE TRIGGER update_categories_updated_at BEFORE
 UPDATE ON categories FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

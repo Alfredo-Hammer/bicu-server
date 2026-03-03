@@ -34,6 +34,7 @@ const SQL_SCRIPTS = [
   'database/migrations/005_insert_default_admin.sql',
   'database/migrations/006_add_user_extended_fields.sql',
   'database/migrations/007_fix_unique_constraints_multi_tenant.sql',
+  'database/migrations/008_add_spare_parts_code_price.sql',
 ];
 
 /**
