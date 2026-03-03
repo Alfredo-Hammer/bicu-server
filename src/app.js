@@ -67,8 +67,8 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
-diagnostic', diagnosticRoutes); // TEMPORAL - Eliminar después de debugging
-app.use('/api/
+
+app.use('/api/diagnostic', diagnosticRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/organizations', organizationRoutes);
 app.use('/api/categories', categoryRoutes);
