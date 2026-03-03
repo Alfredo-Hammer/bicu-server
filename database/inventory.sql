@@ -15,15 +15,16 @@ CREATE TABLE IF NOT EXISTS spare_parts (
   name VARCHAR(150) NOT NULL,
   code VARCHAR(50),
   description TEXT,
-  category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL,
-  stock INTEGER DEFAULT 0 CHECK (stock >= 0),
-  min_stock INTEGER DEFAULT 1 CHECK (min_stock >= 0),
-  price DECIMAL(10, 2),
-  location VARCHAR(150),
-  image_url TEXT,
-  active BOOLEAN DEFAULT true,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  category_id INTEGER REFERENCES categories(id) ON DELETE
+  SET NULL,
+    stock INTEGER DEFAULT 0 CHECK (stock >= 0),
+    min_stock INTEGER DEFAULT 1 CHECK (min_stock >= 0),
+    price DECIMAL(10, 2),
+    location VARCHAR(150),
+    image_url TEXT,
+    active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 -- Create indexes for better query performance
 -- NOTA: Los índices de code y price se crean en 008_add_spare_parts_code_price.sql
