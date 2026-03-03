@@ -33,6 +33,7 @@ const SQL_SCRIPTS = [
   'database/migrations/004_add_user_profile_image.sql',
   'database/migrations/005_insert_default_admin.sql',
   'database/migrations/006_add_user_extended_fields.sql',
+  'database/migrations/007_fix_unique_constraints_multi_tenant.sql',
 ];
 
 /**
