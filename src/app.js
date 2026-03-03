@@ -17,6 +17,7 @@ const userRoutes = require('./routes/userRoutes');
 const auditRoutes = require('./routes/auditRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
 const diagnosticRoutes = require('./routes/diagnosticRoutes'); // TEMPORAL para debugging
+const debugTokenRoutes = require('./routes/debugTokenRoutes'); // TEMPORAL para debugging
 
 const app = express();
 
@@ -68,6 +69,7 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+app.use('/api/debug-token', debugTokenRoutes);
 app.use('/api/diagnostic', diagnosticRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/organizations', organizationRoutes);
