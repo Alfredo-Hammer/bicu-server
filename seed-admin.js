@@ -7,10 +7,13 @@ async function seedAdminUser() {
     const passwordHash = await bcrypt.hash(password, 10);
 
     const query = `
-      INSERT INTO users (name, email, password_hash, role)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO users (name, email, password_hash, role, organization_id)
+      SELECT $1, $2, $3, $4, org.id
+      FROM organizations org
+      WHERE org.code = 'BICU-BLF'
       ON CONFLICT (email) DO UPDATE
-      SET password_hash = EXCLUDED.password_hash
+      SET password_hash = EXCLUDED.password_hash,
+          organization_id = EXCLUDED.organization_id
       RETURNING id, name, email, role;
     `;
 

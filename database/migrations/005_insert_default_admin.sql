@@ -17,11 +17,13 @@ INSERT INTO users (
   )
 SELECT 'Administrador',
   'admin@bicu.edu.ni',
-  '$2b$10$rZ5YhkqJxKxJxKxJxKxJxeO5YhkqJxKxJxKxJxKxJxKxJxKxJxKxJ',
+  '$2b$10$v0p.xiFAvbONfTbpJRTUneK0rlE3zbvRGdMbk6yjI7HBD7z4TzZna',
   'admin',
   org.id
 FROM organizations org
-WHERE org.code = 'BICU-BLF' ON CONFLICT (email) DO NOTHING;
+WHERE org.code = 'BICU-BLF' ON CONFLICT (email) DO UPDATE
+  SET password_hash = EXCLUDED.password_hash,
+      organization_id = EXCLUDED.organization_id;
 -- Verificación
 DO $$
 DECLARE user_count INTEGER;
