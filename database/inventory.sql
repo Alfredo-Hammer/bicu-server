@@ -26,14 +26,14 @@ CREATE TABLE IF NOT EXISTS spare_parts (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 -- Create indexes for better query performance
+-- NOTA: Los índices de code y price se crean en 008_add_spare_parts_code_price.sql
+-- porque esas columnas pueden no existir en instalaciones anteriores
 CREATE INDEX IF NOT EXISTS idx_categories_name ON categories(name);
 CREATE INDEX IF NOT EXISTS idx_categories_active ON categories(active);
 CREATE INDEX IF NOT EXISTS idx_spare_parts_name ON spare_parts(name);
-CREATE INDEX IF NOT EXISTS idx_spare_parts_code ON spare_parts(code);
 CREATE INDEX IF NOT EXISTS idx_spare_parts_category_id ON spare_parts(category_id);
 CREATE INDEX IF NOT EXISTS idx_spare_parts_active ON spare_parts(active);
 CREATE INDEX IF NOT EXISTS idx_spare_parts_stock ON spare_parts(stock);
-CREATE INDEX IF NOT EXISTS idx_spare_parts_price ON spare_parts(price);
 -- Create trigger for categories updated_at
 CREATE TRIGGER update_categories_updated_at BEFORE
 UPDATE ON categories FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
